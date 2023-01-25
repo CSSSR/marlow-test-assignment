@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  atm-service:
+    image: atm-service:0.0.1-SNAPSHOT
+    container_name: atm-service
+    restart: always
+    environment:
+      JDBC_URL: "jdbc:postgresql://postgres:5432/atm_service?currentSchema=public"
+      JDBC_USERNAME: postgres
+      JDBC_PASSWORD: postgresPassword
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      NOTIFICATION_TRANSACTION_ADDED_TOPIC: account.transaction.added
+      NOTIFICATION_BATCH_SIZE: 10
+      NOTIFICATION_SEND_CRON: "0 0/1 * * * *"
+    ports:
+      - "8081:8080"
+  audit-service:
+    image: audit-service:0.0.1-SNAPSHOT
+    container_name: audit-service
+    restart: always
+    environment:
+      JDBC_URL: "jdbc:postgresql://postgres:5432/audit_service?currentSchema=public"
+      JDBC_USERNAME: postgres
+      JDBC_PASSWORD: postgresPassword
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SERVICE_ACCOUNT_TRANSACTION_ADDED_TOPIC: account.transaction.added
+  postgres:
+    build:
+      context: ./docker
+      dockerfile: Postgres.Dockerfile
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgresPassword
+    ports:
+      - "15432:5432"
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.1.9
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  kafka:
+    image: confluentinc/cp-kafka:6.1.9
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"

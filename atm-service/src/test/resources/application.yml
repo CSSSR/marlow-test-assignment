@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: atm-service
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  kafka:
+    producer:
+      acks: 1
+    consumer:
+      auto-offset-reset: earliest
+logging:
+  level:
+    Exposed: debug
+    org.testcontainers: info
+notification:
+  transaction-added-topic: account.transaction.added
+  batch-size: 10
+  send-cron: "-"
