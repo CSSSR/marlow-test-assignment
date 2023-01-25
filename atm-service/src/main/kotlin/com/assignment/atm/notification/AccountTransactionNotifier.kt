@@ -16,6 +16,7 @@ class AccountTransactionNotifier(
     private val notificationConfigurationProperties: NotificationConfigurationProperties
 ) {
 
+    // In case of multiple service instances, it's necessary to use distributed scheduler or library like Shedlock/JobRunr/Quartz
     @Scheduled(cron = "\${notification.send-cron}")
     fun sendAccountTransactionAddedEvents() {
         val accountTransactionIds = transaction {

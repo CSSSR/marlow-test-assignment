@@ -59,6 +59,9 @@ class KafkaConfiguration(private val kafkaProperties: KafkaProperties) {
             Any::class.java to dltJsonKafkaTemplate
         )
 
+        // The real configuration depends on the needs and possible types of errors.
+        // It is possible that we do not want to publish messages to the DLT in case of a temporary exception.
+        // To achieve this behavior, we can use a Backoff implementation without a maximum number of retries.
         val recoverer = DeadLetterPublishingRecoverer(templates) { consumerRecord, exception ->
             logger.error(exception) { "Exception occurred while handling a message with key '${consumerRecord.key()}'" }
             val deadLetterTopic = "${consumerRecord.topic()}.${kafkaProperties.consumer.groupId}.DLT"
