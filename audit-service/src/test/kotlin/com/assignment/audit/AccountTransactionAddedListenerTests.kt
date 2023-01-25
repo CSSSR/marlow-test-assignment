@@ -67,6 +67,7 @@ class AccountTransactionAddedListenerTests(
         kafkaSender.sendMessage(serviceProperties.accountTransactionAddedTopic, accountId, event)
         val dltRecord = kafkaMessageVerifier
             .checkMessageExists<InvalidAccountTransactionAddedEvent>(accountId, "account.transaction.added.audit-service.DLT")
+        dltRecord.key().shouldBe(accountId)
         dltRecord.value().run {
             amount.shouldBe(event.amount)
             occurredAt.shouldBe(event.occurredAt)
@@ -83,6 +84,7 @@ class AccountTransactionAddedListenerTests(
             kafkaSender.sendMessage(serviceProperties.accountTransactionAddedTopic, accountId, event)
             val dltRecord = kafkaMessageVerifier
                 .checkMessageExists<AccountTransactionAddedEvent>(accountId, "account.transaction.added.audit-service.DLT")
+            dltRecord.key().shouldBe(accountId)
             dltRecord.value().run {
                 amount.shouldBe(event.amount)
                 type.shouldBe(event.type)
