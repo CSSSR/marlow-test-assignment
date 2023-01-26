@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: atm-service
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  datasource:
+    url: ${JDBC_URL}
+    username: ${JDBC_USERNAME}
+    password: ${JDBC_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    client-id: ${spring.application.name}
+springdoc:
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+logging:
+  level:
+    Exposed: debug
+notification:
+  transaction-added-topic: ${NOTIFICATION_TRANSACTION_ADDED_TOPIC}
+  batch-size: ${NOTIFICATION_BATCH_SIZE}
+  send-cron: ${NOTIFICATION_SEND_CRON}
